@@ -5,6 +5,7 @@ import 'screens/splash_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/route_provider.dart';
 import 'providers/checklist_provider.dart';
+import 'providers/tracking_provider.dart';
 
 void main() {
   runApp(const BusAlertApp());
@@ -20,6 +21,7 @@ class BusAlertApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => RouteProvider()),
         ChangeNotifierProvider(create: (_) => ChecklistProvider()),
+        ChangeNotifierProvider(create: (_) => TrackingProvider()),
       ],
       child: MaterialApp(
         title: 'BusAlert',

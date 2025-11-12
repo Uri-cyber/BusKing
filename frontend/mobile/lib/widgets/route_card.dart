@@ -4,6 +4,8 @@ import '../models/route.dart';
 import '../config/app_theme.dart';
 import '../config/app_config.dart';
 import '../providers/route_provider.dart';
+import '../providers/tracking_provider.dart';
+import '../screens/tracking_screen.dart';
 
 class RouteCard extends StatelessWidget {
   final UserRoute route;
@@ -146,6 +148,63 @@ class RouteCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            // Track Now Button
+            if (route.isActive)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final trackingProvider = Provider.of<TrackingProvider>(context, listen: false);
+
+                    // Show loading
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+
+                    // Start tracking
+                    final sessionId = await trackingProvider.startTracking(route);
+
+                    if (!context.mounted) return;
+
+                    // Close loading dialog
+                    Navigator.pop(context);
+
+                    if (sessionId != null) {
+                      // Navigate to tracking screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrackingScreen(
+                            route: route,
+                            sessionId: sessionId,
+                          ),
+                        ),
+                      );
+                    } else {
+                      // Show error
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            trackingProvider.error ?? 'שגיאה בהפעלת המעקב',
+                          ),
+                          backgroundColor: AppTheme.error,
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.my_location),
+                  label: const Text('עקוב עכשיו'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

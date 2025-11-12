@@ -215,4 +215,56 @@ class ApiService {
       throw Exception('Delete checklist item failed: ${response.body}');
     }
   }
+
+  // Tracking APIs
+  Future<Map<String, dynamic>> startTracking({
+    required String routeId,
+    required String stopId,
+    required String routeNumber,
+  }) async {
+    await loadToken();
+    final response = await http.post(
+      Uri.parse('${AppConfig.apiBaseUrl}/tracking/start'),
+      headers: headers,
+      body: jsonEncode({
+        'route_id': routeId,
+        'stop_id': stopId,
+        'route_number': routeNumber,
+      }),
+    ).timeout(AppConfig.apiTimeout);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Start tracking failed: ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> stopTracking(String sessionId) async {
+    await loadToken();
+    final response = await http.post(
+      Uri.parse('${AppConfig.apiBaseUrl}/tracking/$sessionId/stop'),
+      headers: headers,
+    ).timeout(AppConfig.apiTimeout);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Stop tracking failed: ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getTrackingStatus(String sessionId) async {
+    await loadToken();
+    final response = await http.get(
+      Uri.parse('${AppConfig.apiBaseUrl}/tracking/$sessionId/status'),
+      headers: headers,
+    ).timeout(AppConfig.apiTimeout);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Get tracking status failed: ${response.body}');
+    }
+  }
 }

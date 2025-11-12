@@ -1,0 +1,138 @@
+name: Dependencies & Security
+
+on:
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  # Update Backend Dependencies
+  update-backend-deps:
+    name: Update Backend Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Check for outdated packages
+        working-directory: backend
+        run: npm outdated || true
+
+      - name: Update dependencies
+        working-directory: backend
+        run: |
+          npm update
+          npm audit fix
+
+      - name: Run tests
+        working-directory: backend
+        run: npm test
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(backend): update dependencies'
+          title: '📦 Update Backend Dependencies'
+          body: |
+            Automated dependency updates for backend.
+
+            Please review and merge if all tests pass.
+          branch: deps/backend-updates
+          labels: dependencies, backend
+
+  # Update Flutter Dependencies
+  update-flutter-deps:
+    name: Update Flutter Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Check for outdated packages
+        working-directory: frontend/mobile
+        run: flutter pub outdated
+
+      - name: Update dependencies
+        working-directory: frontend/mobile
+        run: flutter pub upgrade
+
+      - name: Run tests
+        working-directory: frontend/mobile
+        run: flutter test
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(mobile): update dependencies'
+          title: '📦 Update Flutter Dependencies'
+          body: |
+            Automated dependency updates for Flutter mobile app.
+
+            Please review and merge if all tests pass.
+          branch: deps/flutter-updates
+          labels: dependencies, mobile
+
+  # Security Audit
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run npm audit (Backend)
+        working-directory: backend
+        run: |
+          npm audit --json > audit-results.json || true
+          npm audit
+
+      - name: Upload audit results
+        uses: actions/upload-artifact@v3
+        with:
+          name: npm-audit-results
+          path: backend/audit-results.json
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          format: 'table'
+
+  # Dependency Review
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v3
+        with:
+          fail-on-severity: moderate

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#2196F3" rx="180"/>
+
+  <!-- Bus Icon -->
+  <g transform="translate(512, 512)">
+    <!-- Bus Body -->
+    <rect x="-200" y="-180" width="400" height="280" rx="40" fill="#FFFFFF"/>
+
+    <!-- Windows -->
+    <rect x="-160" y="-140" width="140" height="100" rx="10" fill="#2196F3" opacity="0.3"/>
+    <rect x="20" y="-140" width="140" height="100" rx="10" fill="#2196F3" opacity="0.3"/>
+
+    <!-- Wheels -->
+    <circle cx="-120" cy="100" r="50" fill="#424242"/>
+    <circle cx="-120" cy="100" r="30" fill="#757575"/>
+    <circle cx="120" cy="100" r="50" fill="#424242"/>
+    <circle cx="120" cy="100" r="30" fill="#757575"/>
+
+    <!-- Route Number -->
+    <circle cx="0" cy="0" r="80" fill="#FF9800"/>
+    <text x="0" y="20" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+
+    <!-- Notification Bell (top right) -->
+    <g transform="translate(160, -180)">
+      <path d="M 0 -20 L -15 -5 L 15 -5 Z M -20 -5 L 20 -5 L 20 20 Q 20 30 10 35 L -10 35 Q -20 30 -20 20 Z M -8 38 Q -8 45 0 45 Q 8 45 8 38" fill="#FF9800" stroke="#FFFFFF" stroke-width="3"/>
+    </g>
+  </g>
+</svg>
